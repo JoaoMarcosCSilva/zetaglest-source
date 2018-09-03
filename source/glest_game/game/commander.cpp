@@ -670,7 +670,7 @@ namespace
 					char
 						szBuf[8096] = "";
 					snprintf(szBuf, 8096,
-						"In [%s::%s - %d] Command refers to non existent unit id = %d. Game out of synch.",
+						"In [%s::%s - %d] Command refers to non existent unit id = %d. Game out of sync",
 						extractFileFromDirectoryPath(__FILE__).c_str(),
 						__FUNCTION__, __LINE__, networkCommand->getUnitId());
 					GameNetworkInterface *
@@ -679,14 +679,14 @@ namespace
 					if (gameNetworkInterface != NULL) {
 						char
 							szMsg[8096] = "";
-						snprintf(szMsg, 8096,
-							"Player detected an error: Command refers to non existent unit id = %d. Game out of synch.",
+						snprintf(szMsg, 8096, "Error: Command refers to non-existent unit id %d. Game out of sync, try leaving and rejoining",
 							networkCommand->getUnitId());
 						gameNetworkInterface->
 							sendTextMessage(szMsg, -1, true, "");
 					}
-					throw
-						megaglest_runtime_error(szBuf);
+					/*throw
+						megaglest_runtime_error(szBuf);*/
+					return result;
 				}
 			}
 
@@ -1393,6 +1393,9 @@ namespace
 				}
 				break;
 
+				default:
+					break;
+
 			}
 
 			if (commandWasHandled == false) {
@@ -1599,7 +1602,9 @@ namespace
 				throw
 					megaglest_runtime_error(szBuf);
 			}
-
+			// Create the command.
+			Command *
+				command = NULL;
 			// Get the unit.
 			Unit *
 				target = NULL;
@@ -1629,13 +1634,14 @@ namespace
 					char
 						szMsg[8096] = "";
 					snprintf(szMsg, 8096,
-						"Player detected an error: Can not find unit with id: %d. Game out of synch.",
+						"Error: Cannot find unit with id %d. Game out of sync, try leaving and rejoining",
 						networkCommand->getUnitId());
 					gameNetworkInterface->sendTextMessage(szMsg, -1, true, "");
 				}
 
-				throw
-					megaglest_runtime_error(szBuf);
+				/*throw
+					megaglest_runtime_error(szBuf);*/
+				return command;
 			}
 
 			// Get the command type for the unit.
@@ -1650,10 +1656,9 @@ namespace
 				char
 					szBuf[8096] = "";
 				snprintf(szBuf, 8096,
-					"In [%s::%s Line: %d]\nUnit / Faction mismatch for network command = [%s]\n%s\nfor unit = %d\n[%s]\n[%s]\nactual local factionIndex = %d.\nGame out of synch.",
+					"In [%s::%s Line: %d]\nUnit/Faction mismatch for network command = [%s]\nfor unit = %d\n[%s]\n[%s]\nactual local factionIndex = %d.\nGame out of sync",
 					__FILE__, __FUNCTION__, __LINE__,
 					networkCommand->toString().c_str(),
-					unit->getType()->getCommandTypeListDesc().c_str(),
 					unit->getId(), unit->getFullName(false).c_str(),
 					unit->getDesc(false).c_str(),
 					unit->getFaction()->getIndex());
@@ -1663,49 +1668,29 @@ namespace
 					enabled)
 					SystemFlags::OutputDebug(SystemFlags::debugSystem, "%s\n",
 						szBuf);
-				//std::string worldLog = world->DumpWorldToLog();
-				world->DumpWorldToLog();
+
+				//world->DumpWorldToLog();
 
 				// Broadcast the error if player is still connected and print locally.
 				GameNetworkInterface *
 					gameNetworkInterface =
 					NetworkManager::getInstance().getGameNetworkInterface();
-				if (gameNetworkInterface != NULL
-					&& gameNetworkInterface->isConnected() == true) {
-					char
-						szMsg[8096] = "";
+				if (gameNetworkInterface != NULL) {
+					char szMsg[8096] = "";
 					snprintf(szMsg, 8096,
-						"Player detected an error: Unit / Faction mismatch for unitId: %d",
-						networkCommand->getUnitId());
-					gameNetworkInterface->sendTextMessage(szMsg, -1, true, "");
-					snprintf(szMsg, 8096,
-						"Local faction index = %d, remote index = %d. Game out of synch.",
-						unit->getFaction()->getIndex(),
-						networkCommand->getUnitFactionIndex());
-					gameNetworkInterface->sendTextMessage(szMsg, -1, true, "");
-
-				}
-
-				// Else if it's a network game but the user disconnected, print the error locally only.
-				else if (gameNetworkInterface != NULL) {
-					char
-						szMsg[8096] = "";
-					snprintf(szMsg, 8096,
-						"Player detected an error: Connection lost, possible Unit / Faction mismatch for unitId: %d",
-						networkCommand->getUnitId());
-					gameNetworkInterface->sendTextMessage(szMsg, -1, true, "");
-					snprintf(szMsg, 8096,
-						"Local faction index = %d, remote index = %d. Game out of synch.",
+						"Error: Unit/Faction mismatch for unitId %d, local faction index %d, remote index %d. Game out of sync, try leaving and rejoining",
+						networkCommand->getUnitId(),
 						unit->getFaction()->getIndex(),
 						networkCommand->getUnitFactionIndex());
 					gameNetworkInterface->sendTextMessage(szMsg, -1, true, "");
 				}
 
-				// Kill the game.
+				/*// Kill the game.
 				std::string sError =
 					"Error [#1]: Game is out of sync (Unit / Faction mismatch)\nplease check log files for details.";
 				throw
-					megaglest_runtime_error(sError);
+					megaglest_runtime_error(sError);*/
+				return command;
 			}
 
 			const UnitType *
@@ -1713,13 +1698,7 @@ namespace
 				world->findUnitTypeById(unit->getFaction()->getType(),
 					networkCommand->getUnitTypeId());
 
-			// debug test!
-			//throw megaglest_runtime_error("Test missing command type!");
-
 			//validate command type
-
-			// !!!Test out of synch behaviour
-			//ct = NULL;
 
 			// Check if the command was for the unit before it morphed, if so cancel it.
 			bool
@@ -1741,44 +1720,39 @@ namespace
 				char
 					szBuf[8096] = "";
 				snprintf(szBuf, 8096,
-					"In [%s::%s Line: %d]\nCan not find command type for network command = [%s]\n%s\nfor unit = %d\n[%s]\n[%s]\nactual local factionIndex = %d.\nUnit Type Info:\n[%s]\nNetwork unit type:\n[%s]\nisCancelPreMorphCommand: %d\nGame out of synch.",
+					"In [%s::%s Line: %d]\nCannot find command type for network command = [%s]\nfor unit = %d\n[%s]\n[%s]\nactual local factionIndex = %d.\nUnit Type Info:\n[%s]\nNetwork unit type:\n[%s]\nGame out of sync",
 					extractFileFromDirectoryPath(__FILE__).c_str(),
 					__FUNCTION__, __LINE__,
 					networkCommand->toString().c_str(),
-					unit->getType()->getCommandTypeListDesc().c_str(),
 					unit->getId(), unit->getFullName(false).c_str(),
 					unit->getDesc(false).c_str(),
 					unit->getFaction()->getIndex(),
 					unit->getType()->toString().c_str(),
 					(unitType !=
-						NULL ? unitType->getName(false).c_str() : "null"),
-					isCancelPreMorphCommand);
+						NULL ? unitType->getName(false).c_str() : "null"));
 
 				SystemFlags::OutputDebug(SystemFlags::debugSystem, "%s\n", szBuf);
 				SystemFlags::OutputDebug(SystemFlags::debugError, "%s\n", szBuf);
-				world->DumpWorldToLog();
+				//world->DumpWorldToLog();
 
 				GameNetworkInterface *
 					gameNetworkInterface =
 					NetworkManager::getInstance().getGameNetworkInterface();
 				if (gameNetworkInterface != NULL) {
-					char
-						szMsg[8096] = "";
-					snprintf(szMsg, 8096,
-						"Player detected an error: Can not find command type: %d for unitId: %d [%s]. isCancelPreMorphCommand: %d Game out of synch.",
+					char szMsg[8096] = "";
+					snprintf(szMsg, 8096, "Error: Cannot find command type %d for unitId %d [%s]. Game out of sync, try leaving and rejoining",
 						networkCommand->getCommandTypeId(),
 						networkCommand->getUnitId(),
 						(unitType !=
-							NULL ? unitType->getName(false).c_str() : "null"),
-						isCancelPreMorphCommand);
+							NULL ? unitType->getName(false).c_str() : "null"));
 					gameNetworkInterface->sendTextMessage(szMsg, -1, true, "");
 				}
 
-				std::string sError =
+				/*std::string sError =
 					"Error [#3]: Game is out of sync, please check log files for details.";
-				//abort();
 				throw
-					megaglest_runtime_error(sError);
+					megaglest_runtime_error(sError);*/
+				return command;
 			}
 
 			CardinalDir
@@ -1791,13 +1765,10 @@ namespace
 					/// TODO: What is happening here? The error returned does not match the condition. Why is there a constant of 4?
 					if (networkCommand->getTargetId() < 0
 						|| networkCommand->getTargetId() >= 4) {
-						char
-							szBuf[8096] = "";
-						snprintf(szBuf, 8096,
-							"networkCommand->getTargetId() >= 0 && networkCommand->getTargetId() < 4, [%s]",
-							networkCommand->toString().c_str());
-						throw
-							megaglest_runtime_error(szBuf);
+						printf("networkCommand->getTargetId() >= 0 && networkCommand->getTargetId() < 4, [%s]", networkCommand->toString().c_str());
+						/*throw
+							megaglest_runtime_error(szBuf);*/
+						return command;
 					}
 					facing = CardinalDir(networkCommand->getTargetId());
 				}
@@ -1807,9 +1778,6 @@ namespace
 				}
 			}
 
-			// Create the command.
-			Command *
-				command = NULL;
 			if (isCancelPreMorphCommand == false) {
 				if (unitType != NULL) {
 					command =

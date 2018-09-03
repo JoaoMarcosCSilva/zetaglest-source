@@ -7556,6 +7556,8 @@ namespace Glest {
 					case ctCpuZeta:
 						factionInfo += " CPU Zeta" + multiplier;
 						break;
+					default:
+						break;
 				}
 
 				factionInfo +=
@@ -8635,7 +8637,7 @@ namespace Glest {
 				bool networkPauseGameForLaggedClients) {
 			if (networkPauseGameForLaggedClients == true) {
 				printf
-				("**WARNING** Detected lag from client: %d networkPauseGameForLaggedClients: %d\n",
+				("WARNING: Detected lag from client %d networkPauseGameForLaggedClients: %d\n",
 					slotIndex, networkPauseGameForLaggedClients);
 			} else {
 				printf
