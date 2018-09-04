@@ -60,8 +60,6 @@ namespace Glest {
 
 		// ===================== PUBLIC ========================
 
-		const float PHOTO_MODE_MAXHEIGHT = 500.0;
-
 		const int CREATE_NEW_TEAM = -100;
 		const int CANCEL_SWITCH_TEAM = -1;
 
