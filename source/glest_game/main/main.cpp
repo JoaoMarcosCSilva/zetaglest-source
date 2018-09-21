@@ -5735,10 +5735,10 @@ namespace
 			}
 			PlatformExceptionHandler::disableBacktrace = disableBacktrace;
 
-#if defined(CUSTOM_DATA_INSTALL_PATH)
+#if defined(DATADIR)
 			if (SystemFlags::VERBOSE_MODE_ENABLED)
-				printf("\n\nCUSTOM_DATA_INSTALL_PATH = [%s]\n\n",
-					formatPath(TOSTRING(CUSTOM_DATA_INSTALL_PATH)).c_str());
+				printf("\n\nDATADIR = [%s]\n\n",
+					formatPath(TOSTRING(DATADIR)).c_str());
 #endif
 
 			const int
@@ -7952,8 +7952,17 @@ namespace
 						}
 						//printf("looping\n");
 					}
-
-					program->loop();
+					gameloop:
+#ifndef DEBUG
+					try {
+#endif
+						program->loop();
+#ifndef DEBUG
+					} catch (...) {
+						printf("\nAn unhandled error occurred. Attempting to recover...\n");
+						goto gameloop;
+					}
+#endif
 
 					// Because OpenGL really doesn't do multi-threading well
 					//                      if(difftime(time(NULL),lastTextureLoadEvent) >= 3) {

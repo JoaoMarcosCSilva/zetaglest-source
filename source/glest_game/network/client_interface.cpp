@@ -560,7 +560,8 @@ namespace Glest {
 						serverFTPPort = networkMessageIntro.getFtpPort();
 
 						if (playerIndex < 0 || playerIndex >= GameConstants::maxPlayers) {
-							throw megaglest_runtime_error("playerIndex < 0 || playerIndex >= GameConstants::maxPlayers");
+							printf("playerIndex < 0 || playerIndex >= GameConstants::maxPlayers\n");
+							return;
 						}
 
 						MutexSafeWrapper safeMutexFlags(flagAccessor, CODE_AT_LINE);
@@ -925,9 +926,8 @@ namespace Glest {
 						} else {
 							if (SystemFlags::getSystemSettingType(SystemFlags::debugNetwork).enabled) SystemFlags::OutputDebug(SystemFlags::debugNetwork, "In [%s::%s Lined: %d] got networkMessageLaunch.getMessageType() = %d\n", extractFileFromDirectoryPath(__FILE__).c_str(), __FUNCTION__, __LINE__, networkMessageLaunch.getMessageType());
 
-							char szBuf[1024] = "";
-							snprintf(szBuf, 1023, "In [%s::%s Line: %d] Invalid networkMessageLaunch.getMessageType() = %d", extractFileFromDirectoryPath(__FILE__).c_str(), __FUNCTION__, __LINE__, networkMessageLaunch.getMessageType());
-							throw megaglest_runtime_error(szBuf);
+							printf("In [%s::%s Line: %d] Invalid networkMessageLaunch.getMessageType() = %d\n", extractFileFromDirectoryPath(__FILE__).c_str(), __FUNCTION__, __LINE__, networkMessageLaunch.getMessageType());
+							//throw megaglest_runtime_error(szBuf);
 						}
 
 						networkMessageLaunch.buildGameSettings(&gameSettings);
@@ -1010,13 +1010,13 @@ namespace Glest {
 
 					//make sure we read the message
 					//time_t receiveTimeElapsed = time(NULL);
-					NetworkMessageCommandList networkMessageCommandList;
+					/*NetworkMessageCommandList networkMessageCommandList;
 					bool gotCmd = receiveMessage(&networkMessageCommandList);
 					if (gotCmd == false) {
 						throw megaglest_runtime_error("error retrieving nmtCommandList returned false!");
 					}
 					if (SystemFlags::getSystemSettingType(SystemFlags::debugPerformance).enabled && chrono.getMillis() > 0) SystemFlags::OutputDebug(SystemFlags::debugPerformance, "In [%s::%s Line: %d] took msecs: %lld\n", extractFileFromDirectoryPath(__FILE__).c_str(), __FUNCTION__, __LINE__, chrono.getMillis());
-					if (SystemFlags::getSystemSettingType(SystemFlags::debugPerformance).enabled && chrono.getMillis() > 0) chrono.start();
+					if (SystemFlags::getSystemSettingType(SystemFlags::debugPerformance).enabled && chrono.getMillis() > 0) chrono.start();*/
 
 					this->setLastPingInfoToNow();
 				}
@@ -1025,11 +1025,11 @@ namespace Glest {
 				case nmtQuit:
 				{
 					//time_t receiveTimeElapsed = time(NULL);
-					NetworkMessageQuit networkMessageQuit;
+					/*NetworkMessageQuit networkMessageQuit;
 					bool gotCmd = receiveMessage(&networkMessageQuit);
 					if (gotCmd == false) {
 						throw megaglest_runtime_error("error retrieving nmtQuit returned false!");
-					}
+					}*/
 					if (SystemFlags::getSystemSettingType(SystemFlags::debugPerformance).enabled && chrono.getMillis() > 0) SystemFlags::OutputDebug(SystemFlags::debugPerformance, "In [%s::%s Line: %d] took msecs: %lld\n", extractFileFromDirectoryPath(__FILE__).c_str(), __FUNCTION__, __LINE__, chrono.getMillis());
 					if (SystemFlags::getSystemSettingType(SystemFlags::debugPerformance).enabled && chrono.getMillis() > 0) chrono.start();
 
@@ -1129,7 +1129,7 @@ namespace Glest {
 									return;
 								}
 
-								throw megaglest_runtime_error("error retrieving nmtCommandList returned false!");
+								//throw megaglest_runtime_error("error retrieving nmtCommandList returned false!");
 							}
 
 							//printf("Client Thread getFrameCount(): %d getCommandCount(): %d\n",networkMessageCommandList.getFrameCount(),networkMessageCommandList.getCommandCount());
@@ -1606,11 +1606,11 @@ namespace Glest {
 						}
 					} else if (networkMessageType == nmtCommandList) {
 						//make sure we read the message
-						NetworkMessageCommandList networkMessageCommandList;
+						/*NetworkMessageCommandList networkMessageCommandList;
 						bool gotCmd = receiveMessage(&networkMessageCommandList);
 						if (gotCmd == false) {
 							throw megaglest_runtime_error("error retrieving nmtCommandList returned false!");
-						}
+						}*/
 					} else if (networkMessageType == nmtInvalid) {
 						if (chrono.getMillis() > readyWaitTimeout) {
 							if (SystemFlags::getSystemSettingType(SystemFlags::debugNetwork).enabled) SystemFlags::OutputDebug(SystemFlags::debugNetwork, "In [%s::%s] Line: %d\n", extractFileFromDirectoryPath(__FILE__).c_str(), __FUNCTION__, __LINE__);

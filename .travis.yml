@@ -50,17 +50,35 @@ before_install:
     # ^ odd linking problems related with brew which is not creating links
   - if [ "$TRAVIS_OS_NAME" = "osx" ] && [ "$Tr_Xcode_Version" = "6.4" ]; then brew install Caskroom/cask/xquartz; fi
   - if [ "$Tr_Compiler_Version" != "" ] && [ "$Tr_Compiler_Version" != "default" ] && [ "$CC" = "gcc" ]; then export CXX="g++-${Tr_Compiler_Version}" CC="gcc-${Tr_Compiler_Version}"; fi
-  - if [ "$Tr_Compiler_Version" != "" ] && [ "$Tr_Compiler_Version" != "default" ] && [ "$CC" == "clang" ]; then export CXX="clang++-${Tr_Compiler_Version}" CC="clang-${Tr_Compiler_Version}"; fi
+  - if [ "$Tr_Compiler_Version" != "" ] && [ "$Tr_Compiler_Version" != "default" ] && [ "$CC" == "clang" ]; then
+      export CXX="clang++-${Tr_Compiler_Version}" CC="clang-${Tr_Compiler_Version}";
+    fi
   - $CC --version
   - $CXX --version
   - cmake --version
 
 script:
 # ALL THE BUILD COMMANDS HERE
-  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$(echo "$CC" | grep 'clang')" = "" ]; then mk/linux/build-zg.sh; fi
-  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$(echo "$CC" | grep 'clang')" != "" ]; then mk/linux/build-zg.sh -w; fi
-  # ^ -w may be removed on more modern dist: than trusty, problems related with 'new wx+clang+old gcc'
-  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then mk/macos/build-zg.sh; fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$(echo "$CC" | grep 'clang')" = "" ]; then
+        mkdir build;
+        cd build;
+        cmake ..  -DCMAKE_INSTALL_PREFIX=$PWD/local -DBUILD_MODEL_VIEWER=ON -DBUILD_MAP_EDITOR=ON -DBUILD_MODEL_IMPORT_EXPORT_TOOLS=ON -DBUILD_ZETAGLEST_TESTS=ON;
+        make && make install;
+    fi
+  - if [ "$TRAVIS_OS_NAME" = "linux" ] && [ "$(echo "$CC" | grep 'clang')" != "" ]; then
+        mkdir build;
+        cd build;
+        cmake .. -DCMAKE_INSTALL_PREFIX=$PWD/local -DBUILD_ZETAGLEST_TESTS=ON;
+        make && make install;
+    fi
+  - if [ "$TRAVIS_OS_NAME" = "osx" ]; then
+        mkdir build;
+        cd build;
+        cmake .. -DCMAKE_INSTALL_PREFIX=$PWD/local -DBUILD_MODEL_VIEWER=ON -DBUILD_MAP_EDITOR=ON -DBUILD_MODEL_IMPORT_EXPORT_TOOLS=ON -DBUILD_ZETAGLEST_TESTS=ON;
+        make && make install;
+        echo 'Dependencies:';
+        otool -L zetaglest;
+    fi
 
 # https://docs.travis-ci.com/user/notifications/#IRC-notification
 notifications:

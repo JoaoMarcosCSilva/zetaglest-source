@@ -221,19 +221,11 @@ namespace Glest {
 				foundPath = tryCustomPath(cfgType, fileName, currentpath);
 			}
 
-#if defined(CUSTOM_DATA_INSTALL_PATH)
+#if defined(DATADIR)
 			if (foundPath == false) {
 				foundPath =
 					tryCustomPath(cfgType, fileName,
-						formatPath(TOSTRING(CUSTOM_DATA_INSTALL_PATH)));
-			}
-#endif
-
-#if defined(MG_CMAKE_INSTALL_PREFIX)
-			if (foundPath == false) {
-				foundPath =
-					tryCustomPath(cfgType, fileName,
-						formatPath(TOSTRING(MG_CMAKE_INSTALL_PREFIX)));
+						formatPath(TOSTRING(DATADIR)));
 			}
 #endif
 

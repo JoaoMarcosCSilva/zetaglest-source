@@ -66,7 +66,15 @@ things and are unable to finish it. That lets me and other people know the
 ticket is available to be worked on by other people.
 
 ## Coding style
-Please match the existing style
+
+As we are working on code forked from another project, you may see some inconsistency; however, our goal is:
+
+[The JAVA variant of K&R](https://en.wikipedia.org/wiki/Indentation_style#Variant:_Java)
+
+Use *camelCase* for variables and function names, *CapitalCase* for classes and namespaces, and CAPS_LOCK for macros and compile-time constants.
+Use *tabs* for indenting. Curly braces should be at the side and parameters and
+conditions should be next to each other, not under each other (unless line length
+exceeds 80-120 characters).
 
 Sometimes a patch will be a single line in a single file; other times a single
 patch will consist of changes to several files. Keep unrelated patches separate
@@ -127,7 +135,7 @@ It's possible to work on two or more different patches (and therefore multiple b
 one time, but it's recommended that beginners only work on one patch at a time.
 
 ### Syncing ###
-Periodically, especially before starting a new patch, you'll need the sync your
+Periodically, especially before starting a new patch, you'll need to sync your
 repo with the remote upstream. GitHub has instructions for doing this:
 
 1. [Configuring a remote for a fork](https://help.github.com/articles/configuring-a-remote-for-a-fork/)
